@@ -5,3 +5,4 @@ django-cors-headers
 boto3
 django-storages
 Pillow
+djangorestframework-simplejwt
