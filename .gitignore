@@ -1,0 +1,9 @@
+﻿db/
+storage/
+__pycache__/
+*.pyc
+*.sqlite3
+.env
+.env.*
+backend/config/__pycache__/
+backend/config/settings/__pycache__/
