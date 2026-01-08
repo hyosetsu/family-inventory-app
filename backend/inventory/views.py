@@ -20,4 +20,4 @@ class ItemGroupViewSet(viewsets.ModelViewSet):
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
-    # permission_classes = [IsAuthenticated]  # 後でJWT or Session連携
+    permission_classes = [IsAuthenticated]  # 後でJWT or Session連携
