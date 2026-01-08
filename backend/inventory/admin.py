@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import Location, Tag, Item, ItemImage, ItemGroup
 
-# Register your models here.
+admin.site.register(Location)
+admin.site.register(Tag)
+admin.site.register(Item)
+admin.site.register(ItemImage)
+admin.site.register(ItemGroup)
