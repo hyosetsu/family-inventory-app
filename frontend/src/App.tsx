@@ -1,11 +1,12 @@
+import { Routes, Route } from "react-router-dom";
+import Login from "./pages/Login"; // 作成済みのログイン画面
 import ItemList from "./components/ItemList";
 
-function App() {
+export default function App() {
   return (
-    <div className="container mx-auto py-6">
-      <ItemList />
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/items" element={<ItemList />} />
+    </Routes>
   );
 }
-
-export default App;
