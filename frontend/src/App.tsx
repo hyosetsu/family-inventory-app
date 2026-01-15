@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import ItemList from "./components/ItemList";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/Header";
+import ItemForm from "./components/ItemForm";
 
 export default function App() {
   const location = useLocation();
@@ -21,6 +22,23 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ItemList />
+            </ProtectedRoute>
+          }
+        />
+        {/* 🔽 ここが今回追加した2つ！ */}
+        <Route
+          path="/items/new"
+          element={
+            <ProtectedRoute>
+              <ItemForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/items/:id/edit"
+          element={
+            <ProtectedRoute>
+              <ItemForm isEdit />
             </ProtectedRoute>
           }
         />
