@@ -1,60 +1,57 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../lib/axios";
-import { AxiosError } from "axios";
+import { useAuth } from "../contexts/useAuth";
 
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post("token/", { username, password });
-      const access = response.data.access;
-      localStorage.setItem("access_token", access);
-      window.location.href = "/"; // 成功後にトップへ遷移
-    } catch (err) {
-      const axiosError = err as AxiosError;
-      if (axiosError.response?.status === 401) {
-        setError("ユーザー名またはパスワードが間違っています");
-      } else {
+      const res = await api.post("token/", { username, password });
+      login(res.data.access); // トークン保存
+      navigate("/items"); // 成功後リダイレクト
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "response" in err) {
         setError("ログインに失敗しました");
       }
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded shadow-md w-96"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center">ログイン</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <div className="mb-4">
-          <label className="block text-gray-700">ユーザー名</label>
+    <div className="max-w-sm mx-auto mt-12 p-4 border rounded">
+      <h1 className="text-xl font-bold mb-4">ログイン</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block mb-1 text-sm">ユーザー名</label>
           <input
             type="text"
+            className="w-full border px-3 py-2 rounded"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full border px-3 py-2 rounded"
             required
           />
         </div>
-        <div className="mb-6">
-          <label className="block text-gray-700">パスワード</label>
+        <div>
+          <label className="block mb-1 text-sm">パスワード</label>
           <input
             type="password"
+            className="w-full border px-3 py-2 rounded"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border px-3 py-2 rounded"
             required
           />
         </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
         >
           ログイン
         </button>
