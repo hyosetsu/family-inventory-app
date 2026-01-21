@@ -7,7 +7,7 @@ const api = axios.create({
   },
 });
 
-// ✅ ここでアクセストークンを自動でリクエストに付与する
+// 🔽 認証トークンを自動で付与する
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
   if (token) {
