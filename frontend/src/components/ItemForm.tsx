@@ -22,6 +22,7 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
   const [locationId, setLocationId] = useState<number | null>(null);
   const [groupId, setGroupId] = useState<number | null>(null);
   const [tagIds, setTagIds] = useState<number[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -61,11 +62,27 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
     // 🔽 ここで送信前にログ出力！
     console.log("送信データ:", payload);
 
+    // ✅ itemId を先に宣言（新規 or 編集どちらでも使う）
+    let itemId: string | undefined = id;
+
     try {
       if (isEdit && id) {
         await api.put(`items/${id}/`, payload);
       } else {
-        await api.post("items/", payload);
+        const res = await api.post("items/", payload);
+        itemId = res.data.id; // 新規作成時は ID を取得
+      }
+
+      // ✅ 画像アップロード（ファイルがあれば）
+      if (imageFile && itemId) {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+
+        await api.post(`items/${itemId}/upload_image/`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
       }
 
       navigate("/items");
@@ -76,7 +93,7 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
         console.error("送信時エラー:", err.message);
       }
     }
-  };
+  };;
 
   return (
     <form onSubmit={handleSubmit} className="p-4 space-y-4">
@@ -150,6 +167,20 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
             </label>
           ))}
         </div>
+      </div>
+
+      <div>
+        <label className="block font-medium">画像アップロード</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              setImageFile(file);
+            }
+          }}
+        />
       </div>
 
       <button

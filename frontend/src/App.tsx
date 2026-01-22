@@ -4,6 +4,7 @@ import ItemList from "./components/ItemList";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/Header";
 import ItemForm from "./components/ItemForm";
+import ItemDetail from "./components/ItemDetail";
 
 export default function App() {
   const location = useLocation();
@@ -39,6 +40,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ItemForm isEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/items/:id"
+          element={
+            <ProtectedRoute>
+              <ItemDetail />
             </ProtectedRoute>
           }
         />

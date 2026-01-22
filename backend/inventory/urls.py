@@ -1,6 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ItemViewSet, LocationViewSet, TagViewSet, ItemGroupViewSet
+from .views import (
+    ItemViewSet, LocationViewSet, TagViewSet, ItemGroupViewSet,
+    ItemImageUploadView  # ← 追加
+)
 
 router = DefaultRouter()
 router.register(r'items', ItemViewSet)
@@ -10,4 +13,5 @@ router.register(r'groups', ItemGroupViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('items/<int:item_id>/upload_image/', ItemImageUploadView.as_view()),
 ]

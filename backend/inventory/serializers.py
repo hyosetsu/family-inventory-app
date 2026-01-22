@@ -16,8 +16,18 @@ class ItemGroupSerializer(serializers.ModelSerializer):
         model = ItemGroup
         fields = '__all__'
 
+class ItemImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItemImage
+        fields = ['id', 'image', 'uploaded_at']
+
 class ItemSerializer(serializers.ModelSerializer):
+    images = ItemImageSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Item
         fields = "__all__"
         read_only_fields = ["owner"]
+    
+    def get_images(self, obj):
+        return [img.image.url for img in obj.images.all()]
