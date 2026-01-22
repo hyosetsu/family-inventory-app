@@ -23,6 +23,9 @@ class ItemImageSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     images = ItemImageSerializer(many=True, read_only=True)
+    location = LocationSerializer() 
+    group = ItemGroupSerializer()   
+    tags = TagSerializer(many=True) 
     
     class Meta:
         model = Item

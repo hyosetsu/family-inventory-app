@@ -1,66 +1,58 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import api from "../lib/axios";
 
-type ItemDetailProps = {
+// アイテム詳細用の型
+type ItemDetail = {
   id: number;
   name: string;
   description: string;
-  images: { id: number; image: string; uploaded_at: string }[];
+  created_at: string;
   location: { id: number; name: string };
+  owner: { id: number; username: string };
   group: { id: number; name: string };
   tags: { id: number; name: string }[];
+  images: { id: number; image: string; uploaded_at: string }[];
 };
 
 export default function ItemDetail() {
   const { id } = useParams();
-  const [item, setItem] = useState<ItemDetailProps | null>(null);
-  const navigate = useNavigate();
+  const { data, isLoading, error } = useQuery<ItemDetail>({
+    queryKey: ["item", id],
+    queryFn: () => api.get(`items/${id}`).then((res) => res.data),
+  });
 
-  useEffect(() => {
-    if (id) {
-      api.get(`items/${id}/`).then((res) => {
-        setItem(res.data);
-      });
-    }
-  }, [id]);
-
-  if (!item) return <p>読み込み中...</p>;
+  if (isLoading) return <p>読み込み中...</p>;
+  if (error) return <p>エラーが発生しました</p>;
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-semibold mb-4">{item.name}</h1>
-      <div className="mb-4">
-        {item.images.length > 0 ? (
-          <img
-            src={item.images[0].image}
-            alt={item.name}
-            className="w-72 h-72 object-cover rounded"
-          />
-        ) : (
-          <p>画像なし</p>
-        )}
-      </div>
-      <p>{item.description}</p>
-      <p>場所: {item.location.name}</p>
-      <p>グループ: {item.group.name}</p>
-      <p>タグ: {item.tags.map((tag) => tag.name).join(", ")}</p>
-
+      <h1 className="text-2xl font-bold">{data?.name}</h1>
+      <p className="text-sm text-gray-600">{data?.description}</p>
       <div className="mt-4">
-        <button
-          className="bg-yellow-500 text-white px-4 py-2 rounded"
-          onClick={() => navigate(`/items/${id}/edit`)}
-        >
-          編集
-        </button>
-        <button
-          className="bg-red-500 text-white px-4 py-2 rounded ml-2"
-          onClick={() => {
-            /* 削除機能をここに追加 */
-          }}
-        >
-          削除
-        </button>
+        {/* ロケーションの表示 */}
+        <p>ロケーション: {data?.location?.name || "未設定"}</p>
+        {/* グループの表示 */}
+        <p>グループ: {data?.group?.name || "未設定"}</p>
+        {/* タグの表示 */}
+        <p>タグ: {data?.tags?.map((tag) => tag.name).join(", ") || "未設定"}</p>
+      </div>
+      <div className="mt-4">
+        <h2>画像</h2>
+        <div className="flex gap-4">
+          {data?.images.map((image) => (
+            <img
+              key={image.id}
+              src={image.image}
+              alt="Item Image"
+              className="w-32 h-32 object-contain rounded" // object-contain を使って画像が枠内に収まるようにする
+              style={{
+                maxWidth: "300px", // 画像の最大幅を指定
+                maxHeight: "300px", // 画像の最大高さを指定
+              }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
