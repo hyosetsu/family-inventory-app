@@ -9,6 +9,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from django.db.models import Q
+from django.contrib.auth.models import User
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]  
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            'id': user.id,
+            'username': user.username,
+            'email': user.email
+        })
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
@@ -44,10 +56,21 @@ class ItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]  # 後でJWT or Session連携
 
     def perform_create(self, serializer):
+        # アイテムを作成する際に、ユーザーを所有者として設定
         serializer.save(owner=self.request.user)
 
     def perform_update(self, serializer):
+        # アイテムを更新する際に、ユーザーが所有者か確認
+        item = self.get_object()
+        if item.owner != self.request.user:
+            return Response({'detail': 'このアイテムの編集権限がありません。'}, status=status.HTTP_403_FORBIDDEN)
         serializer.save(owner=self.request.user)
+
+    def perform_destroy(self, instance):
+        # アイテムを削除する際にもユーザーが所有者か確認
+        if instance.owner != self.request.user:
+            return Response({'detail': 'このアイテムの削除権限がありません。'}, status=status.HTTP_403_FORBIDDEN)
+        instance.delete()
 
     def get_queryset(self):
         queryset = Item.objects.all()
