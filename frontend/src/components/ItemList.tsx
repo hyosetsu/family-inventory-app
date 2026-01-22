@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "../lib/axios";
+import { useState } from "react";
 
 // Item型を定義
 type Item = {
@@ -14,10 +15,43 @@ type Item = {
   images?: { id: number; image: string; uploaded_at: string }[];
 };
 
+type Location = { id: number; name: string };
+type Tag = { id: number; name: string };
+type Group = { id: number; name: string };
+
 export default function ItemList() {
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+
   const { data, isPending, error } = useQuery<Item[]>({
-    queryKey: ["items"],
-    queryFn: () => api.get("items/").then((res) => res.data),
+    queryKey: ["items", selectedLocation, selectedTag, selectedGroup],
+    queryFn: () =>
+      api
+        .get("items/", {
+          params: {
+            location: selectedLocation,
+            tag: selectedTag,
+            group: selectedGroup,
+          },
+        })
+        .then((res) => res.data),
+  });
+
+  // APIからロケーション、タグ、グループデータを取得
+  const { data: locations } = useQuery<Location[]>({
+    queryKey: ["locations"],
+    queryFn: () => api.get("locations/").then((res) => res.data),
+  });
+
+  const { data: tags } = useQuery<Tag[]>({
+    queryKey: ["tags"],
+    queryFn: () => api.get("tags/").then((res) => res.data),
+  });
+
+  const { data: groups } = useQuery<Group[]>({
+    queryKey: ["groups"],
+    queryFn: () => api.get("groups/").then((res) => res.data),
   });
 
   if (isPending) return <p>読み込み中...</p>;
@@ -26,6 +60,53 @@ export default function ItemList() {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">アイテム一覧</h1>
+      
+      {/* フィルターフォーム */}
+      <div className="mb-4">
+        <label className="mr-2">ロケーション</label>
+        <select
+          value={selectedLocation}
+          onChange={(e) => setSelectedLocation(e.target.value)}
+          className="border px-2 py-1"
+        >
+          <option value="">すべて</option>
+          {locations?.map((location) => (
+            <option key={location.id} value={location.id}>
+              {location.name}
+            </option>
+          ))}
+        </select>
+
+        <label className="ml-4 mr-2">タグ</label>
+        <select
+          value={selectedTag}
+          onChange={(e) => setSelectedTag(e.target.value)}
+          className="border px-2 py-1"
+        >
+          <option value="">すべて</option>
+          {tags?.map((tag) => (
+            <option key={tag.id} value={tag.id}>
+              {tag.name}
+            </option>
+          ))}
+        </select>
+
+        <label className="ml-4 mr-2">グループ</label>
+        <select
+          value={selectedGroup}
+          onChange={(e) => setSelectedGroup(e.target.value)}
+          className="border px-2 py-1"
+        >
+          <option value="">すべて</option>
+          {groups?.map((group) => (
+            <option key={group.id} value={group.id}>
+              {group.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* アイテム一覧 */}
       <ul className="space-y-2">
         {data?.map((item) => (
           <li

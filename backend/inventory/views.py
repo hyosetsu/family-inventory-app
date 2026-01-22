@@ -8,6 +8,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from django.db.models import Q
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
@@ -47,3 +48,20 @@ class ItemViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def get_queryset(self):
+        queryset = Item.objects.all()
+        
+        # フィルターパラメータを取得
+        location = self.request.query_params.get('location', None)
+        tag = self.request.query_params.get('tag', None)
+        group = self.request.query_params.get('group', None)
+
+        if location:
+            queryset = queryset.filter(location=location)
+        if tag:
+            queryset = queryset.filter(tags__id=tag)
+        if group:
+            queryset = queryset.filter(group=group)
+
+        return queryset
