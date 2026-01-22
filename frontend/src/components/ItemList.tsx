@@ -19,27 +19,37 @@ type Item = {
 type Location = { id: number; name: string };
 type Tag = { id: number; name: string };
 type Group = { id: number; name: string };
-type User = { id: number }; 
+type User = { id: number };
 
 export default function ItemList() {
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [selectedTag, setSelectedTag] = useState<string>("");
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [currentUser, setCurrentUser] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  useEffect(() => {
-    api
-      .get("users/me/") // ユーザー情報を取得するエンドポイント
-      .then((response) => {
-        setCurrentUser(response.data.id); // ユーザーIDをセット
-      })
-      .catch((error) => {
-        console.error("ユーザー情報の取得に失敗:", error);
-      });
-  }, []);
+  // ユーザー情報を取得
+  const {
+    data: userData,
+    isLoading: userLoading,
+    error: userError,
+  } = useQuery<User>({
+    queryKey: ["user"],
+    queryFn: () => api.get("users/me/").then((res) => res.data),
+    onSuccess: (data) => {
+      setCurrentUser(data.id); // 取得したユーザー情報をセット
+    },
+  });
 
-  const { data, isPending, error } = useQuery<Item[]>({
-    queryKey: ["items", selectedLocation, selectedTag, selectedGroup],
+  // アイテムのデータを取得
+  const { data, isLoading, error, refetch } = useQuery<Item[]>({
+    queryKey: [
+      "items",
+      selectedLocation,
+      selectedTag,
+      selectedGroup,
+      searchQuery,
+    ],
     queryFn: () =>
       api
         .get("items/", {
@@ -47,12 +57,14 @@ export default function ItemList() {
             location: selectedLocation,
             tag: selectedTag,
             group: selectedGroup,
+            name: searchQuery,
           },
         })
         .then((res) => res.data),
+    enabled: !!currentUser, // currentUserがセットされてからデータを取得
   });
 
-  // APIからロケーション、タグ、グループデータを取得
+  // ロケーション、タグ、グループのデータを取得
   const { data: locations } = useQuery<Location[]>({
     queryKey: ["locations"],
     queryFn: () => api.get("locations/").then((res) => res.data),
@@ -68,8 +80,29 @@ export default function ItemList() {
     queryFn: () => api.get("groups/").then((res) => res.data),
   });
 
-  if (isPending) return <p>読み込み中...</p>;
-  if (error) return <p>エラーが発生しました</p>;
+  // currentUserがセットされた後にアイテムのデータを取得する
+  useEffect(() => {
+    if (currentUser !== null) {
+      // currentUserが設定されると自動でアイテムを取得
+      refetch(); // アイテムのデータをリフェッチ
+    }
+  }, [
+    currentUser,
+    selectedLocation,
+    selectedTag,
+    selectedGroup,
+    searchQuery,
+    refetch,
+  ]); // currentUserが変更された時にアイテムデータをリフェッチ
+
+  if (userLoading || isLoading) return <p>読み込み中...</p>;
+  if (userError || error) return <p>エラーが発生しました</p>;
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // 検索ボタン押下でアイテムのデータをリフェッチ
+    refetch();
+  };
 
   return (
     <div className="p-4">
@@ -118,6 +151,22 @@ export default function ItemList() {
             </option>
           ))}
         </select>
+
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="検索..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border px-2 py-1"
+          />
+        </div>
+        <button
+          onClick={handleSearchSubmit}
+          className="bg-blue-600 text-white px-4 py-2 mt-4 rounded"
+        >
+          検索
+        </button>
       </div>
 
       {/* アイテム一覧 */}

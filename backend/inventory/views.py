@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework import filters
 from .models import Item, Location, Tag, ItemGroup, ItemImage
 from .serializers import (
     LocationSerializer, TagSerializer, ItemGroupSerializer, ItemSerializer
@@ -54,6 +55,8 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = [IsAuthenticated]  # 後でJWT or Session連携
+    filter_backends = (filters.OrderingFilter, filters.SearchFilter)
+    search_fields = ['name', 'description']
 
     def perform_create(self, serializer):
         # アイテムを作成する際に、ユーザーを所有者として設定
@@ -76,10 +79,15 @@ class ItemViewSet(viewsets.ModelViewSet):
         queryset = Item.objects.all()
         
         # フィルターパラメータを取得
+        name = self.request.query_params.get('name', None)
         location = self.request.query_params.get('location', None)
         tag = self.request.query_params.get('tag', None)
         group = self.request.query_params.get('group', None)
 
+        if name:
+            queryset = queryset.filter(
+                Q(name__icontains=name) | Q(description__icontains=name)
+            )
         if location:
             queryset = queryset.filter(location=location)
         if tag:
