@@ -175,20 +175,27 @@ export default function ItemList() {
             key={item.id}
             className="bg-white border rounded-lg p-4 flex gap-4 hover:shadow transition"
           >
-            {item.images && item.images.length > 0 ? (
-              <img
-                src={item.images[0].image}
-                alt={item.name}
-                className="w-24 h-24 object-cover rounded shrink-0"
-                style={{ maxWidth: "96px", maxHeight: "96px" }}
-              />
-            ) : (
-              <div className="w-24 h-24 bg-gray-200 text-center flex items-center justify-center text-sm text-gray-500 rounded shrink-0">
-                画像なし
-              </div>
-            )}
+            <Link to={`/items/${item.id}`} className="shrink-0">
+              {item.images && item.images.length > 0 ? (
+                <img
+                  src={item.images[0].image}
+                  alt={item.name}
+                  className="w-24 h-24 object-cover rounded shrink-0"
+                  style={{ maxWidth: "96px", maxHeight: "96px" }}
+                />
+              ) : (
+                <div className="w-24 h-24 bg-gray-200 text-center flex items-center justify-center text-sm text-gray-500 rounded shrink-0">
+                  画像なし
+                </div>
+              )}
+            </Link>
             <div className="flex-1 overflow-hidden">
-              <p className="font-semibold truncate">{item.name}</p>
+              <Link
+                to={`/items/${item.id}`}
+                className="font-semibold truncate text-blue-700 hover:underline"
+              >
+                {item.name}
+              </Link>
               <p className="text-sm text-gray-600 line-clamp-3 break-words">
                 {item.description}
               </p>
