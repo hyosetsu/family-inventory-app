@@ -50,7 +50,7 @@ export default function ItemDetail() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-5xl mx-auto px-4 py-6">
       {/* 戻る */}
       <button
         onClick={() => navigate(-1)}
@@ -59,10 +59,10 @@ export default function ItemDetail() {
         ← 一覧へ戻る
       </button>
 
-      <h1 className="text-2xl font-bold mb-2">{data.name}</h1>
-      <p className="text-gray-700 whitespace-pre-wrap">{data.description}</p>
+      <h1 className="text-2xl font-bold mb-1">{data.name}</h1>
+      <p className="text-sm text-gray-500 mb-4">{data.description}</p>
 
-      <div className="mt-4 space-y-1 text-sm">
+      <div className="bg-white border rounded-lg p-4 text-sm space-y-1">
         <p>ロケーション: {data.location?.name || "未設定"}</p>
         <p>グループ: {data.group?.name || "未設定"}</p>
         <p>
@@ -83,7 +83,7 @@ export default function ItemDetail() {
               src={image.image}
               alt="Item"
               onClick={() => setSelectedImage(image.image)}
-              className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80"
+              className="aspect-square object-cover rounded border hover:shadow cursor-pointer"
             />
           ))}
         </div>

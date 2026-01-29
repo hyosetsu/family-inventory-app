@@ -105,76 +105,75 @@ export default function ItemList() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">アイテム一覧</h1>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-6">アイテム一覧</h1>
 
       {/* フィルターフォーム */}
-      <div className="mb-4">
-        <label className="mr-2">ロケーション</label>
-        <select
-          value={selectedLocation}
-          onChange={(e) => setSelectedLocation(e.target.value)}
-          className="border px-2 py-1"
-        >
-          <option value="">すべて</option>
-          {locations?.map((location) => (
-            <option key={location.id} value={location.id}>
-              {location.name}
-            </option>
-          ))}
-        </select>
+      <div className="bg-white border rounded-lg p-4 mb-6 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <select
+            value={selectedLocation}
+            onChange={(e) => setSelectedLocation(e.target.value)}
+            className="border rounded px-3 py-2"
+          >
+            <option value="">すべてのロケーション</option>
+            {locations?.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.name}
+              </option>
+            ))}
+          </select>
 
-        <label className="ml-4 mr-2">タグ</label>
-        <select
-          value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
-          className="border px-2 py-1"
-        >
-          <option value="">すべて</option>
-          {tags?.map((tag) => (
-            <option key={tag.id} value={tag.id}>
-              {tag.name}
-            </option>
-          ))}
-        </select>
+          <select
+            value={selectedTag}
+            onChange={(e) => setSelectedTag(e.target.value)}
+            className="border rounded px-3 py-2"
+          >
+            <option value="">すべてのタグ</option>
+            {tags?.map((tag) => (
+              <option key={tag.id} value={tag.id}>
+                {tag.name}
+              </option>
+            ))}
+          </select>
 
-        <label className="ml-4 mr-2">グループ</label>
-        <select
-          value={selectedGroup}
-          onChange={(e) => setSelectedGroup(e.target.value)}
-          className="border px-2 py-1"
-        >
-          <option value="">すべて</option>
-          {groups?.map((group) => (
-            <option key={group.id} value={group.id}>
-              {group.name}
-            </option>
-          ))}
-        </select>
+          <select
+            value={selectedGroup}
+            onChange={(e) => setSelectedGroup(e.target.value)}
+            className="border rounded px-3 py-2"
+          >
+            <option value="">すべてのグループ</option>
+            {groups?.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <div className="mt-4">
+        <div className="flex gap-3">
           <input
             type="text"
             placeholder="検索..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border px-2 py-1"
+            className="flex-1 border rounded px-3 py-2"
           />
+          <button
+            onClick={handleSearchSubmit}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            検索
+          </button>
         </div>
-        <button
-          onClick={handleSearchSubmit}
-          className="bg-blue-600 text-white px-4 py-2 mt-4 rounded"
-        >
-          検索
-        </button>
       </div>
 
       {/* アイテム一覧 */}
-      <ul className="space-y-2">
+      <ul className="space-y-4">
         {data?.map((item) => (
           <li
             key={item.id}
-            className="border rounded p-2 flex items-start gap-4 max-w-full overflow-hidden"
+            className="bg-white border rounded-lg p-4 flex gap-4 hover:shadow transition"
           >
             {item.images && item.images.length > 0 ? (
               <img

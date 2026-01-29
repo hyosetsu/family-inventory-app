@@ -96,99 +96,103 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
   };;
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 space-y-4">
-      <div>
-        <label className="block font-medium">名前</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border px-2 py-1 w-full"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium">説明</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="border px-2 py-1 w-full"
-        />
-      </div>
-
-      <div>
-        <label className="block font-medium">場所（Location）</label>
-        <select
-          value={locationId ?? ""}
-          onChange={(e) => setLocationId(Number(e.target.value))}
-          className="border px-2 py-1 w-full"
-        >
-          <option value="">選択してください</option>
-          {locations.map((loc) => (
-            <option key={loc.id} value={loc.id}>
-              {loc.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium">グループ</label>
-        <select
-          value={groupId ?? ""}
-          onChange={(e) => setGroupId(Number(e.target.value))}
-          className="border px-2 py-1 w-full"
-        >
-          <option value="">選択してください</option>
-          {groups.map((grp) => (
-            <option key={grp.id} value={grp.id}>
-              {grp.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block font-medium">タグ</label>
-        <div className="flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <label key={tag.id} className="flex items-center gap-1">
-              <input
-                type="checkbox"
-                checked={tagIds.includes(tag.id)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setTagIds([...tagIds, tag.id]);
-                  } else {
-                    setTagIds(tagIds.filter((id) => id !== tag.id));
-                  }
-                }}
-              />
-              {tag.name}
-            </label>
-          ))}
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      <form className="bg-white border rounded-lg p-6 space-y-5">
+        <div>
+          <label className="block font-medium">名前</label>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="border rounded px-3 py-2 w-full focus:ring focus:ring-blue-200"
+          />
         </div>
-      </div>
 
-      <div>
-        <label className="block font-medium">画像アップロード</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) {
-              setImageFile(file);
-            }
-          }}
-        />
-      </div>
+        <div>
+          <label className="block font-medium">説明</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="border px-2 py-1 w-full"
+          />
+        </div>
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded"
-      >
-        {isEdit ? "更新する" : "登録する"}
-      </button>
-    </form>
+        <div>
+          <label className="block font-medium">場所（Location）</label>
+          <select
+            value={locationId ?? ""}
+            onChange={(e) => setLocationId(Number(e.target.value))}
+            className="border rounded px-3 py-2 w-full focus:ring focus:ring-blue-200"
+          >
+            <option value="">選択してください</option>
+            {locations.map((loc) => (
+              <option key={loc.id} value={loc.id}>
+                {loc.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block font-medium">グループ</label>
+          <select
+            value={groupId ?? ""}
+            onChange={(e) => setGroupId(Number(e.target.value))}
+            className="border rounded px-3 py-2 w-full focus:ring focus:ring-blue-200"
+          >
+            <option value="">選択してください</option>
+            {groups.map((grp) => (
+              <option key={grp.id} value={grp.id}>
+                {grp.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block font-medium">タグ</label>
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <label key={tag.id} className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  checked={tagIds.includes(tag.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setTagIds([...tagIds, tag.id]);
+                    } else {
+                      setTagIds(tagIds.filter((id) => id !== tag.id));
+                    }
+                  }}
+                  className="border rounded px-3 py-2 w-full focus:ring focus:ring-blue-200"
+                />
+                {tag.name}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block font-medium">画像アップロード</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setImageFile(file);
+              }
+            }}
+            className="border rounded px-3 py-2 w-full focus:ring focus:ring-blue-200"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          {isEdit ? "更新する" : "登録する"}
+        </button>
+      </form>
+    </div>
   );
 }
