@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../lib/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { AxiosError } from "axios";
@@ -48,7 +48,7 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
     }
   }, [isEdit, id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const payload = {
@@ -94,7 +94,7 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
         console.error("送信時エラー:", err.message);
       }
     }
-  };;
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">

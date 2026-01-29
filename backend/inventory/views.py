@@ -100,3 +100,7 @@ class ItemViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(group=group)
 
         return queryset
+    
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return super().update(request, *args, **kwargs)

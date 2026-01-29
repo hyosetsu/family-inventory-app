@@ -31,7 +31,7 @@ class ItemSerializer(serializers.ModelSerializer):
         queryset=ItemGroup.objects.all(), allow_null=True, required=False
     )
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(), many=True, required=False
+        queryset=Tag.objects.all(), many=True, required=False, allow_empty=True
     )
 
     # 🔽 読み取り用（object）

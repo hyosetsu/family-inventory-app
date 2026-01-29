@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "../lib/axios";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 // Item型を定義
 type Item = {
@@ -45,7 +45,12 @@ export default function ItemList() {
   }, [user]);
 
   // アイテムのデータを取得
-  const { data, isLoading, error, refetch } = useQuery<Item[]>({
+  const {
+    data: items,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<Item[], Error>({
     queryKey: [
       "items",
       selectedLocation,
@@ -53,18 +58,18 @@ export default function ItemList() {
       selectedGroup,
       searchQuery,
     ],
-    queryFn: () =>
-      api
-        .get("items/", {
-          params: {
-            location: selectedLocation,
-            tag: selectedTag,
-            group: selectedGroup,
-            name: searchQuery,
-          },
-        })
-        .then((res) => res.data),
-    enabled: !!currentUser, // currentUserがセットされてからデータを取得
+    queryFn: async () => {
+      const res = await api.get<Item[]>("items/", {
+        params: {
+          location: selectedLocation,
+          tag: selectedTag,
+          group: selectedGroup,
+          name: searchQuery,
+        },
+      });
+      return res.data;
+    },
+    enabled: !!currentUser,
   });
 
   // ロケーション、タグ、グループのデータを取得
@@ -101,9 +106,8 @@ export default function ItemList() {
   if (userLoading || isLoading) return <p>読み込み中...</p>;
   if (userError || error) return <p>エラーが発生しました</p>;
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleSearchSubmit = (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // 検索ボタン押下でアイテムのデータをリフェッチ
     refetch();
   };
 
@@ -180,7 +184,7 @@ export default function ItemList() {
 
       {/* アイテム一覧 */}
       <ul className="space-y-4">
-        {data?.map((item) => (
+        {items?.map((item) => (
           <li
             key={item.id}
             className="bg-white border rounded-lg p-4 flex gap-4 hover:shadow transition"
