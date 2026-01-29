@@ -4,6 +4,7 @@ from .models import Item, Location, Tag, ItemGroup, ItemImage
 from .serializers import (
     LocationSerializer, TagSerializer, ItemGroupSerializer, ItemSerializer
 )
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -66,13 +67,13 @@ class ItemViewSet(viewsets.ModelViewSet):
         # アイテムを更新する際に、ユーザーが所有者か確認
         item = self.get_object()
         if item.owner != self.request.user:
-            return Response({'detail': 'このアイテムの編集権限がありません。'}, status=status.HTTP_403_FORBIDDEN)
-        serializer.save(owner=self.request.user)
+            raise PermissionDenied("このアイテムの編集権限がありません")
+        serializer.save()
 
     def perform_destroy(self, instance):
         # アイテムを削除する際にもユーザーが所有者か確認
         if instance.owner != self.request.user:
-            return Response({'detail': 'このアイテムの削除権限がありません。'}, status=status.HTTP_403_FORBIDDEN)
+            raise PermissionDenied("このアイテムの削除権限がありません")
         instance.delete()
 
     def get_queryset(self):
@@ -83,6 +84,9 @@ class ItemViewSet(viewsets.ModelViewSet):
         location = self.request.query_params.get('location', None)
         tag = self.request.query_params.get('tag', None)
         group = self.request.query_params.get('group', None)
+
+        if self.request.query_params.get("mine") == "true":
+            queryset = queryset.filter(owner=self.request.user)
 
         if name:
             queryset = queryset.filter(
