@@ -1,8 +1,9 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import api from "../lib/axios";
+import { useState } from "react";
 
-// アイテム詳細用の型
+// 型定義
 type ItemDetail = {
   id: number;
   name: string;
@@ -22,6 +23,7 @@ type User = {
 export default function ItemDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // アイテム取得
   const { data, isLoading, error } = useQuery<ItemDetail>({
@@ -48,11 +50,19 @@ export default function ItemDetail() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold">{data.name}</h1>
-      <p className="text-sm text-gray-600">{data.description}</p>
+    <div className="max-w-3xl mx-auto p-4">
+      {/* 戻る */}
+      <button
+        onClick={() => navigate(-1)}
+        className="text-sm text-blue-600 hover:underline mb-4"
+      >
+        ← 一覧へ戻る
+      </button>
 
-      <div className="mt-4 space-y-1">
+      <h1 className="text-2xl font-bold mb-2">{data.name}</h1>
+      <p className="text-gray-700 whitespace-pre-wrap">{data.description}</p>
+
+      <div className="mt-4 space-y-1 text-sm">
         <p>ロケーション: {data.location?.name || "未設定"}</p>
         <p>グループ: {data.group?.name || "未設定"}</p>
         <p>
@@ -63,22 +73,23 @@ export default function ItemDetail() {
         </p>
       </div>
 
-      {/* 画像 */}
-      <div className="mt-4">
+      {/* 画像一覧 */}
+      <div className="mt-6">
         <h2 className="font-semibold mb-2">画像</h2>
-        <div className="flex gap-4 flex-wrap">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {data.images.map((image) => (
             <img
               key={image.id}
               src={image.image}
-              alt="Item Image"
-              className="w-32 h-32 object-contain rounded border"
+              alt="Item"
+              onClick={() => setSelectedImage(image.image)}
+              className="w-full h-32 object-cover rounded border cursor-pointer hover:opacity-80"
             />
           ))}
         </div>
       </div>
 
-      {/* owner 限定ボタン */}
+      {/* owner限定ボタン */}
       {isOwner && (
         <div className="mt-6 flex gap-3">
           <Link
@@ -93,6 +104,20 @@ export default function ItemDetail() {
           >
             削除
           </button>
+        </div>
+      )}
+
+      {/* 画像モーダル */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          onClick={() => setSelectedImage(null)}
+        >
+          <img
+            src={selectedImage}
+            alt="Preview"
+            className="max-w-[90%] max-h-[90%] rounded shadow-lg"
+          />
         </div>
       )}
     </div>
