@@ -30,16 +30,19 @@ export default function ItemList() {
 
   // ユーザー情報を取得
   const {
-    data: userData,
+    data: user,
     isLoading: userLoading,
     error: userError,
   } = useQuery<User>({
     queryKey: ["user"],
     queryFn: () => api.get("users/me/").then((res) => res.data),
-    onSuccess: (data) => {
-      setCurrentUser(data.id); // 取得したユーザー情報をセット
-    },
   });
+
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user.id);
+    }
+  }, [user]);
 
   // アイテムのデータを取得
   const { data, isLoading, error, refetch } = useQuery<Item[]>({
@@ -107,6 +110,13 @@ export default function ItemList() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-6">アイテム一覧</h1>
+
+      <Link
+        to="/items/new"
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        + アイテム追加
+      </Link>
 
       {/* フィルターフォーム */}
       <div className="bg-white border rounded-lg p-4 mb-6 space-y-4">

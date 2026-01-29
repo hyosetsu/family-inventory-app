@@ -41,9 +41,9 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
         const item = res.data;
         setName(item.name);
         setDescription(item.description);
-        setLocationId(item.location);
-        setGroupId(item.group);
-        setTagIds(item.tags);
+        setLocationId(item.location?.id ?? null);
+        setGroupId(item.group?.id ?? null);
+        setTagIds(item.tags.map((t: any) => t.id));
       });
     }
   }, [isEdit, id]);
@@ -54,8 +54,8 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
     const payload = {
       name,
       description,
-      location: locationId,
-      group: groupId,
+      location: locationId || null,
+      group: groupId || null,
       tags: tagIds,
     };
 
@@ -67,7 +67,8 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
 
     try {
       if (isEdit && id) {
-        await api.put(`items/${id}/`, payload);
+        await api.patch(`items/${id}/`, payload);
+        navigate(`/items/${id}`);
       } else {
         const res = await api.post("items/", payload);
         itemId = res.data.id; // 新規作成時は ID を取得
@@ -97,7 +98,10 @@ export default function ItemForm({ isEdit = false }: ItemFormProps) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      <form className="bg-white border rounded-lg p-6 space-y-5">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border rounded-lg p-6 space-y-5"
+      >
         <div>
           <label className="block font-medium">名前</label>
           <input
